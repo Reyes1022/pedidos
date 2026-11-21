@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Consolidar pedidos a CSV</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#111113;--card:#1b1b1f;--line:#2c2c33;--yel:#ffd400;--txt:#f2f2f4;--mut:#a3a3ad;--grn:#25d366;--red:#ff6b5b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--txt);font-family:Montserrat,system-ui,sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:40px;margin:4px 0 6px}
+  h1 span{color:var(--yel)}
+  p{color:var(--mut);font-size:14.5px;line-height:1.5;margin:6px 0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+  h2{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--yel);margin:0 0 10px;font-weight:800}
+  textarea{width:100%;min-height:170px;font:inherit;font-size:14px;color:var(--txt);background:#0d0d10;border:1.5px solid var(--line);border-radius:12px;padding:12px;outline:none;resize:vertical}
+  textarea:focus{border-color:var(--yel)}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  button,.file{font:inherit;font-weight:800;font-size:15px;border:0;border-radius:12px;padding:13px 16px;cursor:pointer}
+  .primary{background:var(--yel);color:var(--ink)}
+  .ghost{background:transparent;color:var(--txt);border:1.5px solid var(--line)}
+  .green{background:var(--grn);color:#fff}
+  .file{display:inline-block;background:transparent;color:var(--txt);border:1.5px solid var(--line)}
+  .file input{display:none}
+  .opts{display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:14px;font-weight:600;margin-top:4px}
+  .opts label{display:flex;gap:8px;align-items:center}
+  .opts input{accent-color:var(--yel);width:18px;height:18px}
+  select{font:inherit;font-size:14px;color:var(--txt);background:#0d0d10;border:1.5px solid var(--line);border-radius:10px;padding:8px}
+  .stats{font-size:14px;margin:4px 0 10px;color:var(--mut)}
+  .stats b{color:var(--yel)}
+  .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#0d0d10;color:var(--mut);font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;position:sticky;top:0}
+  tr.off td{opacity:.35;text-decoration:line-through}
+  tr.dup td{color:var(--red)}
+  td input{accent-color:var(--yel);width:18px;height:18px}
+  .tag{font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(255,107,91,.15);color:var(--red)}
+  pre{white-space:pre;overflow:auto;background:#0d0d10;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;max-height:260px}
+  .msg{font-size:14px;margin-top:10px;min-height:20px}
+  .msg.ok{color:var(--grn)} .msg.bad{color:var(--red)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>PEDIDOS → <span>CSV</span></h1>
+  <p>Junta en un solo archivo todos los pedidos que te llegan por WhatsApp. Todo se procesa aquí en tu navegador: no se sube nada a ningún lado.</p>
+
+  <section>
+    <h2>1 · Trae los pedidos</h2>
+    <p><b style="color:var(--txt)">Opción A:</b> en WhatsApp, mantén presionados los mensajes de pedido, cópialos y pégalos aquí (puedes pegar varios, uno debajo del otro).<br>
+       <b style="color:var(--txt)">Opción B:</b> en el chat, toca ⋮ → Más → <i>Exportar chat</i> → <i>Sin archivos</i>, y carga aquí el .txt.</p>
+    <textarea id="src" placeholder="Pega aquí los mensajes de pedido…"></textarea>
+    <div class="btns">
+      <label class="file">📄 Cargar chat exportado (.txt)<input type="file" id="file" accept=".txt,text/plain"></label>
+      <button class="ghost" id="clear">Limpiar</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>2 · Revisa</h2>
+    <div class="opts">
+      <label><input type="checkbox" id="optHeader" checked> Incluir encabezado</label>
+      <label><input type="checkbox" id="optDup" checked> Quitar seriales repetidos</label>
+      <label><input type="checkbox" id="optClient"> Agregar cliente y celular</label>
+      <label>Separador
+        <select id="optSep"><option value=",">Coma ( , )</option><option value=";">Punto y coma ( ; )</option></select></label>
+    </div>
+    <div class="stats" id="stats">Todavía no hay pedidos.</div>
+    <div class="tbl"><table id="tbl"></table></div>
+    <p>Desmarca los que no vayas a grabar todavía. Las filas con <span class="tag">REVISAR</span> necesitan que confirmes la clase con el cliente.</p>
+  </section>
+
+  <section>
+    <h2>3 · Descarga</h2>
+    <div class="btns">
+      <button class="primary" id="dl">⬇ Descargar CSV</button>
+      <button class="ghost" id="copy">Copiar texto</button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <pre id="out"></pre>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const COLS = ["VMAX","SERIE","AÑO","POTENCIA","MARCA","MODELO","PESO","CATEGORIA","CLASE"];
+  let rows = [];          // {f:[9 fields], cliente, cel, on, dup}
+
+  function parse(text){
+    const out = [];
+    // split by each order so we can grab client data near the CSV line
+    const blocks = text.split(/PEDIDO PLACA LEY 2486/i);
+    for (const b of blocks){
+      const m = b.match(/CSV:\s*([^\n\r]+)/i);
+      if (!m) continue;
+      const f = m[1].trim().replace(/[*_~]+$/,"").split(",").map(s=>s.trim());
+      if (f.length < 9) continue;
+      const cli = (b.match(/Cliente:\*?\s*([^\n\r]+)/i)||[])[1] || "";
+      const cel = (b.match(/Celular:\*?\s*([0-9 ]+)/i)||[])[1] || "";
+      out.push({f:f.slice(0,9), cliente:cli.replace(/\*/g,"").trim(), cel:cel.replace(/\D/g,""), on:true});
+    }
+    // also catch lone CSV lines that were pasted without the header
+    if (!out.length){
+      for (const m of text.matchAll(/CSV:\s*([^\n\r]+)/gi)){
+        const f = m[1].trim().split(",").map(s=>s.trim());
+        if (f.length >= 9) out.push({f:f.slice(0,9), cliente:"", cel:"", on:true});
+      }
+    }
+    return out;
+  }
+
+  function markDups(){
+    const seen = new Set();
+    rows.forEach(r => { const k = r.f[1].toUpperCase(); r.dup = seen.has(k); seen.add(k); });
+  }
+
+  function esc(v, sep){
+    v = String(v);
+    return (v.includes(sep) || v.includes('"')) ? '"' + v.replace(/"/g,'""') + '"' : v;
+  }
+
+  function build(){
+    const sep = $("optSep").value, withC = $("optClient").checked, noDup = $("optDup").checked;
+    const head = withC ? COLS.concat(["CLIENTE","CELULAR"]) : COLS;
+    const lines = [];
+    if ($("optHeader").checked) lines.push(head.join(sep));
+    let n = 0;
+    rows.forEach(r => {
+      if (!r.on || (noDup && r.dup)) return;
+      const f = withC ? r.f.concat([r.cliente, r.cel]) : r.f;
+      lines.push(f.map(v=>esc(v,sep)).join(sep)); n++;
+    });
+    return {text: lines.join("\r\n"), n};
+  }
+
+  function render(){
+    markDups();
+    const noDup = $("optDup").checked;
+    const t = $("tbl");
+    if (!rows.length){ t.innerHTML = ""; $("stats").textContent = "Todavía no hay pedidos."; $("out").textContent=""; return; }
+    let h = "<tr><th></th><th>#</th>" + COLS.map(c=>"<th>"+c+"</th>").join("") + "<th>Cliente</th><th>Celular</th></tr>";
+    rows.forEach((r,i)=>{
+      const cls = (!r.on || (noDup && r.dup)) ? "off" : (r.dup ? "dup" : "");
+      h += '<tr class="'+cls+'"><td><input type="checkbox" data-i="'+i+'"'+(r.on?" checked":"")+'></td><td>'+(i+1)+'</td>' +
+        r.f.map((v,j)=> "<td>"+ (j===8 && /REVISAR/i.test(v) ? '<span class="tag">REVISAR</span>' : escapeHtml(v)) + (j===1 && r.dup ? ' <span class="tag">REPETIDO</span>' : "") +"</td>").join("") +
+        "<td>"+escapeHtml(r.cliente)+"</td><td>"+escapeHtml(r.cel)+"</td></tr>";
+    });
+    t.innerHTML = h;
+    const b = build();
+    const dups = rows.filter(r=>r.dup).length, rev = rows.filter(r=>/REVISAR/i.test(r.f[8])).length;
+    $("stats").innerHTML = "<b>"+rows.length+"</b> pedidos encontrados · <b>"+b.n+"</b> van al CSV" +
+      (dups ? " · "+dups+" repetidos" : "") + (rev ? " · "+rev+" por revisar" : "");
+    $("out").textContent = b.text;
+  }
+  const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  function load(text){ rows = parse(text); render(); $("msg").textContent = rows.length ? "" : "No encontré pedidos. Asegúrate de copiar el mensaje completo, incluida la línea que empieza por CSV:"; $("msg").className = rows.length ? "msg" : "msg bad"; }
+
+  $("src").addEventListener("input", e => load(e.target.value));
+  $("file").addEventListener("change", e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => { $("src").value = r.result; load(r.result); }; r.readAsText(f, "utf-8");
+  });
+  $("clear").addEventListener("click", () => { $("src").value = ""; rows = []; render(); $("msg").textContent=""; });
+  ["optHeader","optDup","optClient","optSep"].forEach(id => $(id).addEventListener("change", render));
+  $("tbl").addEventListener("change", e => { const i = e.target.dataset.i; if (i!==undefined){ rows[i].on = e.target.checked; render(); } });
+
+  $("dl").addEventListener("click", () => {
+    const b = build();
+    if (!b.n){ $("msg").textContent = "No hay pedidos para descargar."; $("msg").className="msg bad"; return; }
+    const d = new Date(), stamp = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const blob = new Blob(["﻿" + b.text], {type:"text/csv;charset=utf-8"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "placas_" + stamp + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    $("msg").textContent = "Listo: placas_" + stamp + ".csv con " + b.n + " placas."; $("msg").className = "msg ok";
+  });
+  $("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(build().text); $("msg").textContent = "Copiado."; $("msg").className="msg ok"; }
+    catch(e){ const r=document.createRange(); r.selectNodeContents($("out")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $("msg").textContent="Texto seleccionado: cópialo."; }
+  });
+})();
+</script>
+</body>
+</html>
