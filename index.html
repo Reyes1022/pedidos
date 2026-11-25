@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pide tu placa Ley 2486</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#111113;--card:#1b1b1f;--line:#2c2c33;--yel:#ffd400;--txt:#f2f2f4;--mut:#a3a3ad;--grn:#25d366;--red:#ff6b5b}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--txt);font-family:Montserrat,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 60px}
+  header h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:44px;line-height:1;margin:6px 0 6px;letter-spacing:.5px}
+  header h1 span{color:var(--yel)}
+  header p{margin:0 0 4px;color:var(--mut);font-size:15px;line-height:1.45}
+  .badge{display:inline-block;background:var(--yel);color:var(--ink);font-weight:800;font-size:12px;padding:5px 10px;border-radius:999px;letter-spacing:.4px}
+  .plate-wrap{position:sticky;top:0;z-index:5;background:linear-gradient(var(--ink) 85%,transparent);padding:14px 0 18px;margin:0 -2px}
+  .plate-wrap small{display:block;text-align:center;color:var(--mut);font-size:12px;margin-top:6px}
+  svg.plate{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6))}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin:14px 0}
+  section h2{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--yel);margin:0 0 14px;font-weight:800}
+  label{display:block;font-weight:700;font-size:15px;margin:14px 0 6px}
+  label:first-of-type{margin-top:0}
+  .help{display:block;font-weight:500;font-size:12.5px;color:var(--mut);margin-top:3px;line-height:1.4}
+  input[type=text],input[type=tel],input[type=number],select,textarea{width:100%;font:inherit;font-size:16px;color:var(--txt);background:#0d0d10;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--yel)}
+  input::placeholder,textarea::placeholder{color:rgba(255,107,91,.28);opacity:1;font-style:italic}
+  input.bad,select.bad{border-color:var(--red)}
+  input.good{border-color:var(--grn)}
+  .note.ok{color:var(--grn)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .row label,.row3 label{margin-top:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips input{position:absolute;opacity:0;pointer-events:none}
+  .chips label{margin:0;font-weight:600;font-size:14.5px;padding:11px 14px;border:1.5px solid var(--line);border-radius:999px;cursor:pointer;background:#0d0d10}
+  .chips input:checked+label{background:var(--yel);color:var(--ink);border-color:var(--yel)}
+  .chips input:focus-visible+label{outline:2px solid var(--yel);outline-offset:2px}
+  .unit{position:relative}
+  .unit input{padding-right:44px}
+  .row3 .unit input{padding-left:10px;padding-right:36px;font-size:16px;-moz-appearance:textfield}
+  .row3 input::-webkit-outer-spin-button,.row3 input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  #pot{padding-right:26px!important}
+  #cel,#ciudad{padding-left:10px;padding-right:8px}
+  #cel::placeholder{letter-spacing:-.3px}
+  .row3{gap:8px!important}
+  .row3 .unit b{right:9px;font-size:13px}
+  .row3{align-items:end}
+  .unit b{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:14px;font-weight:700}
+  .clase{display:flex;gap:12px;align-items:center;background:#0d0d10;border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;margin-top:16px}
+  .clase .k{font-size:12px;color:var(--mut);font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+  .clase .v{font-family:Anton,Impact,sans-serif;font-size:26px;letter-spacing:.5px}
+  .clase.ok .v{color:var(--yel)}
+  .clase.warn{border-color:var(--red)}
+  .clase.warn .v{color:var(--red)}
+  .note{font-size:13px;line-height:1.45;color:var(--mut);margin:8px 0 0}
+  .note.warn{color:var(--red)}
+  .check{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:14.5px;margin-top:14px;line-height:1.4}
+  .check input{width:22px;height:22px;accent-color:var(--yel);flex:none;margin-top:1px}
+  .total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
+  .total .t{font-family:Anton,Impact,sans-serif;font-size:40px;color:var(--yel)}
+  .lines{font-size:14px;color:var(--mut);line-height:1.7}
+  .lines div{display:flex;justify-content:space-between}
+  button,.btn{display:block;width:100%;text-align:center;font:inherit;font-weight:800;font-size:17px;border:0;border-radius:14px;padding:17px;cursor:pointer;text-decoration:none}
+  .primary{background:var(--yel);color:var(--ink);margin-top:18px}
+  .wa{background:var(--grn);color:#fff;margin-top:12px}
+  .ghost{background:transparent;color:var(--txt);border:1.5px solid var(--line);margin-top:10px}
+  .errors{background:rgba(255,107,91,.1);border:1px solid var(--red);color:#ffc9c2;border-radius:12px;padding:12px 14px;font-size:14px;margin-top:14px;display:none}
+  .errors ul{margin:6px 0 0;padding-left:18px}
+  #done{display:none}
+  #done pre{white-space:pre-wrap;background:#0d0d10;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13.5px;line-height:1.5;color:var(--txt);max-height:320px;overflow:auto}
+  .step{display:flex;gap:12px;margin:12px 0;font-size:14.5px;line-height:1.45}
+  .step b.n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--yel);color:var(--ink);display:grid;place-items:center;font-weight:800}
+  footer{color:var(--mut);font-size:12px;text-align:center;margin-top:28px;line-height:1.6}
+  .hidden{display:none!important}
+  details.norma{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#0d0d10}
+  details.norma summary{cursor:pointer;font-weight:700;font-size:14.5px;color:var(--yel)}
+  details.norma table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+  details.norma th,details.norma td{text-align:left;vertical-align:top;padding:8px 6px;border-bottom:1px solid var(--line)}
+  details.norma th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+  details.norma td span{color:var(--mut);font-size:11.5px;font-weight:500;display:block}
+  details.norma tr.cat td{color:var(--yel);font-weight:800;font-size:12px;padding-top:14px;border-bottom:1px solid var(--yel)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="badge">OBLIGATORIA DESDE EL 1 DE ENERO DE 2027</span>
+    <h1>PIDE TU PLACA<br><span>LEY 2486</span></h1>
+    <p>Lámina de identificación para patinetas, bicicletas y vehículos eléctricos livianos. Grabada en láser con los datos de tu vehículo.</p>
+  </header>
+
+  <div class="plate-wrap">
+    <svg class="plate" viewBox="0 0 104 30" xmlns="http://www.w3.org/2000/svg" aria-label="Vista previa de tu placa">
+      <rect x="0" y="0" width="104" height="30" rx="1.6" fill="#1c1c1e"/>
+      <g fill="none" stroke="#cfd2d6" stroke-width=".3">
+        <circle cx="5" cy="15" r="2.3"/><circle cx="99" cy="15" r="2.3"/>
+      </g>
+      <circle cx="5" cy="15" r="1.2" fill="#0a0a0a"/><circle cx="99" cy="15" r="1.2" fill="#0a0a0a"/>
+      <g font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#cfd2d6">
+        <text x="10" y="7.3" font-size="5">LEY 2486</text>
+        <text x="40" y="6.6" font-size="2.3">Velocidad máxima de construcción:</text>
+        <text id="pv-vmax" x="88" y="7.1" font-size="3.6" text-anchor="end">--</text>
+        <text x="89" y="6.6" font-size="2.3">km/h</text>
+        <text x="12" y="13.7" font-size="2.3">NÚMERO DE SERIE:</text>
+        <rect x="35" y="10.2" width="58" height="5.2" fill="none" stroke="#cfd2d6" stroke-width=".25"/>
+        <text id="pv-serie" x="36.2" y="14.2" font-size="3.6" textLength="0">-</text>
+        <text x="12" y="19.9" font-size="2.3">AÑO DE FAB.:</text>
+        <rect x="29" y="16.4" width="13" height="5" fill="none" stroke="#cfd2d6" stroke-width=".25"/>
+        <text id="pv-anio" x="35.5" y="20.3" font-size="3.6" text-anchor="middle">-</text>
+        <text x="49" y="19.9" font-size="2.3">POTENCIA NOMINAL:</text>
+        <rect x="75" y="16.4" width="15" height="5" fill="none" stroke="#cfd2d6" stroke-width=".25"/>
+        <text id="pv-pot" x="82.5" y="20.3" font-size="3.6" text-anchor="middle">-</text>
+        <g id="pv-boxes"></g>
+      </g>
+      <g pointer-events="none" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#ffd400" fill-opacity=".22" text-anchor="middle" transform="rotate(-12 52 15)">
+        <text x="52" y="17.5" font-size="4.6">VISTA PREVIA · NO VÁLIDA PARA FABRICAR</text>
+      </g>
+    </svg>
+    <small>Así se verá tu placa · 104 × 30 mm · aluminio negro mate</small>
+  </div>
+
+  <form id="f" novalidate>
+    <section>
+      <h2>1 · Tu vehículo</h2>
+      <label>¿Qué tipo de vehículo es?</label>
+      <div class="chips" id="tipo">
+        <input type="radio" name="tipo" id="t1" value="Patineta"><label for="t1">Patineta / scooter</label>
+        <input type="radio" name="tipo" id="t2" value="Bicicleta"><label for="t2">Bicicleta con pedales</label>
+        <input type="radio" name="tipo" id="t3" value="Moto"><label for="t3">Tipo moto con sillín</label>
+        <input type="radio" name="tipo" id="t4" value="Monociclo"><label for="t4">Monociclo</label>
+        <input type="radio" name="tipo" id="t5" value="Triciclo"><label for="t5">Triciclo / 3 ruedas</label>
+      </div>
+
+      <label>¿Para cuántas personas es?
+        <span class="help">Cuenta los puestos o sillines, incluido el del conductor.</span></label>
+      <div class="chips">
+        <input type="radio" name="plazas" id="p1" value="1" checked><label for="p1">Solo 1 persona</label>
+        <input type="radio" name="plazas" id="p2" value="2"><label for="p2">2 o más personas</label>
+      </div>
+
+      <div id="accWrap" class="hidden">
+        <label>¿Avanza con acelerador sin pedalear?
+          <span class="help">Si tiene acelerador en el manubrio y anda sin pedalear, marca Sí.</span></label>
+        <div class="chips">
+          <input type="radio" name="acel" id="a1" value="No"><label for="a1">No, solo ayuda al pedalear</label>
+          <input type="radio" name="acel" id="a2" value="Si"><label for="a2">Sí, tiene acelerador</label>
+        </div>
+      </div>
+
+      <div id="usoWrap" class="hidden">
+        <label>¿Para qué se usa?</label>
+        <div class="chips">
+          <input type="radio" name="uso" id="u1" value="Personas" checked><label for="u1">Llevar personas</label>
+          <input type="radio" name="uso" id="u2" value="Carga"><label for="u2">Llevar carga o mercancía</label>
+        </div>
+      </div>
+
+      <div id="autoWrap" class="hidden">
+        <label>¿Tiene autoequilibrio?
+          <span class="help">Se mantiene derecho solo, como un monociclo o un hoverboard.</span></label>
+        <div class="chips">
+          <input type="radio" name="auto" id="e1" value="No" checked><label for="e1">No</label>
+          <input type="radio" name="auto" id="e2" value="Si"><label for="e2">Sí</label>
+        </div>
+      </div>
+
+      <div class="row3">
+        <div><label for="vmax">Vel. máx.</label><div class="unit"><input id="vmax" type="number" inputmode="numeric" min="1" max="99" placeholder="25"><b>km/h</b></div></div>
+        <div><label for="pot">Potencia</label><div class="unit"><input id="pot" type="number" inputmode="numeric" min="1" max="9999" placeholder="350"><b>W</b></div></div>
+        <div><label for="peso">Peso</label><div class="unit"><input id="peso" type="number" inputmode="decimal" min="1" max="400" step="0.1" placeholder="17"><b>kg</b></div></div>
+      </div>
+      <p class="note">Estos datos están en el manual, en la caja, en la factura o en la etiqueta debajo de la plataforma. Escribe lo que diga el fabricante, no lo que creas que alcanza. El <b>peso es con la batería puesta</b> y la <b>potencia es la nominal continua</b>, no la potencia pico o máxima que a veces anuncian.</p>
+
+      <div class="clase" id="claseBox">
+        <div><div class="k">Categoría y clase según el Anexo 80</div><div class="v" id="claseTxt">—</div></div>
+      </div>
+      <p class="note" id="claseNote">Llena tipo, velocidad y potencia, y la clase se calcula sola.</p>
+
+      <details class="norma">
+        <summary>Ver categorías y clases según la norma</summary>
+        <p class="note">Anexo 80, Resolución 20263040030675 de 2026. La lámina es para los vehículos eléctricos exceptuados por el artículo 15 de la Ley 2486: los que pesan <b>60 kg o menos</b> (con batería) o que <b>no superan 40 km/h</b>.</p>
+        <table>
+          <tr><th>Clase</th><th>Velocidad</th><th>Condiciones</th></tr>
+          <tr class="cat"><td colspan="3">VELMPU · movilidad personal urbana</td></tr>
+          <tr><td><b>Monociclo</b></td><td>6 a 25 km/h</td><td>Una rueda, una plaza. Hasta 1000 W (2500 W con autoequilibrio)</td></tr>
+          <tr><td><b>VMP (A)</b></td><td>6 a 25 km/h</td><td>Una plaza. Hasta 1000 W (2500 W con autoequilibrio)</td></tr>
+          <tr><td><b>VMP (B)</b></td><td>25 a 40 km/h</td><td>Una plaza. Hasta 1000 W (2500 W con autoequilibrio)</td></tr>
+          <tr><td><b>Bicicleta eléctrica</b></td><td>ayuda hasta 25 km/h</td><td>Una plaza, pedales, sin acelerador. Hasta 1000 W</td></tr>
+          <tr class="cat"><td colspan="3">L1e · vehículo de motor de dos ruedas ligero</td></tr>
+          <tr><td><b>L1e-A <span>ciclo de motor</span></b></td><td>ayuda hasta 25 km/h</td><td>Pedaleo asistido. Hasta 1000 W</td></tr>
+          <tr><td><b>L1e-B <span>ciclomotor</span></b></td><td>hasta 45 km/h</td><td>Cualquier otro L1e. Hasta 4000 W</td></tr>
+          <tr class="cat"><td colspan="3">L2e · ciclomotor de tres ruedas</td></tr>
+          <tr><td><b>L2e-P <span>pasajeros</span></b></td><td>hasta 45 km/h</td><td>Hasta 2 plazas, 4000 W y menos de 270 kg</td></tr>
+          <tr><td><b>L2e-U <span>mercancías</span></b></td><td>hasta 45 km/h</td><td>Plataforma de carga, 4000 W y menos de 270 kg</td></tr>
+          <tr class="cat"><td colspan="3">Tricimóvil</td></tr>
+          <tr><td><b>Con pedaleo asistido</b></td><td>ayuda hasta 25 km/h</td><td>Hasta 500 W, menos de 270 kg, máximo 3 personas</td></tr>
+        </table>
+        <p class="note"><b style="color:var(--txt)">No llevan esta lámina:</b> vehículos de más de 60 kg que superan 40 km/h, los de más de 45 km/h o 4000 W (van con matrícula y placa del RUNT) y los que no tienen motor. Si tienes dudas, escríbenos antes de pedir.</p>
+      </details>
+    </section>
+
+    <section>
+      <h2>2 · Datos para grabar</h2>
+      <div class="row">
+        <div><label for="marca">Marca</label><input id="marca" type="text" maxlength="12" placeholder="Ej. Xiaomi" autocapitalize="words"></div>
+        <div><label for="modelo">Modelo</label><input id="modelo" type="text" maxlength="12" placeholder="Ej. Pro 4"></div>
+      </div>
+      <label for="anio">Año de fabricación</label>
+      <select id="anio"><option value="">Selecciona…</option></select>
+      <label for="serie">Número de serie
+        <span class="help">Cópialo exacto, letra por letra. Suele estar en una etiqueta en la plataforma, el tubo del asiento o el chasís.</span></label>
+      <input id="serie" type="text" maxlength="24" placeholder="Ej. 26871/DXAN2F5SU01234" autocapitalize="characters" autocomplete="off" spellcheck="false">
+      <label for="serie2">Repite el número de serie</label>
+      <input id="serie2" type="text" maxlength="24" autocapitalize="characters" autocomplete="off" spellcheck="false">
+      <p class="note" id="serieNote"></p>
+      <label class="check"><input type="checkbox" id="foto"> Confirmo que los datos están bien escritos. La placa se graba exactamente como los ingresé.</label>
+    </section>
+
+    <section>
+      <h2>3 · Tus datos y entrega</h2>
+      <label for="nombre">Nombre completo</label>
+      <input id="nombre" type="text" autocomplete="name" placeholder="Ej. Juan Pérez">
+      <div class="row">
+        <div><label for="cel">Celular</label><input id="cel" type="tel" inputmode="numeric" maxlength="10" placeholder="Ej. 3001234567" autocomplete="tel-national"></div>
+        <div><label for="ciudad">Ciudad</label><input id="ciudad" type="text" placeholder="Ej. Bogotá" value=""></div>
+      </div>
+      <label>¿Cómo la recibes?</label>
+      <div class="chips">
+        <input type="radio" name="entrega" id="d1" value="Recoger en Bogotá" checked><label for="d1">Recojo en Bogotá</label>
+        <input type="radio" name="entrega" id="d2" value="Envío"><label for="d2">Envío a domicilio</label>
+      </div>
+      <div id="dirWrap" class="hidden">
+        <label for="dir">Dirección de envío</label>
+        <input id="dir" type="text" placeholder="Calle 80 #20-15, apto 301, Barrio Chicó">
+        <p class="note">El envío se cobra aparte según la ciudad. Te confirmamos el valor por WhatsApp.</p>
+      </div>
+      <label class="check"><input type="checkbox" id="inst"> Quiero que me la instalen con remaches (+ $10.000, en Bogotá)</label>
+      <label for="codigo">Código de referido (opcional)</label>
+      <input id="codigo" type="text" autocapitalize="characters">
+      <p class="note" id="codNote"></p>
+
+      <div class="lines" id="lines"></div>
+      <div class="total"><span style="font-weight:700">Total</span><span class="t" id="total">$35.000</span></div>
+    </section>
+
+    <div class="errors" id="errors"></div>
+    <button type="submit" class="primary">Revisar mi pedido</button>
+  </form>
+
+  <section id="done">
+    <div id="stepConfirm">
+      <h2>Último paso: confirma tu pedido</h2>
+      <p class="note" style="font-size:14.5px">Revisa la vista previa de arriba. Si todo está bien, envía tu pedido. Si algo está mal, toca "Corregir datos".</p>
+      <div class="lines" id="lines2" style="margin-top:12px"></div>
+      <button type="button" class="btn primary" id="sendBtn">Confirmar y enviar pedido</button>
+      <div class="errors" id="sendErr"></div>
+      <a id="waBtn" class="btn wa" href="#" target="_blank" rel="noopener" style="display:none">Enviar pedido por WhatsApp</a>
+      <button type="button" class="ghost" id="editBtn">Corregir datos</button>
+    </div>
+    <div id="stepOk" style="display:none">
+      <h2>¡Pedido recibido!</h2>
+      <div style="text-align:center;margin:6px 0 14px">
+        <div class="note" style="margin:0">Tu número de pedido es</div>
+        <div id="okId" style="font-family:Anton,Impact,sans-serif;font-size:56px;color:var(--yel);letter-spacing:2px">#----</div>
+        <div class="note" style="margin:0">Total: <b id="okTotal" style="color:var(--txt)"></b></div>
+      </div>
+      <div class="step"><b class="n">1</b><span>Escríbenos por WhatsApp con tu número de pedido para coordinar el pago.</span></div>
+      <div class="step"><b class="n">2</b><span>Cuando se confirme el pago, grabamos tu placa y coordinamos la entrega.</span></div>
+      <a id="waOk" class="btn wa" href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+      <p class="note">O escríbenos al <b style="color:var(--txt)">311 500 7275</b> con tu número de pedido.</p>
+    </div>
+    <pre id="msg" hidden></pre>
+  </section>
+
+  <footer>Lámina en el formato del Anexo 81 de la Resolución 20263040030675 de 2026 (Ministerio de Transporte).<br>WhatsApp 311 500 7275</footer>
+</div>
+
+<script>
+(function(){
+  const WA = "573115007275";
+  // URL de la aplicación web de Google Apps Script (termina en /exec)
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvCB_nJGMFLG0p6KC89lYxlo4t6_gJCgK_Niou5ozgfU-Q-SWkE9A8AuzfUY_5zaY/exec";
+  const USE_SHEET = /^https:\/\/script\.google\.com\//.test(SCRIPT_URL);
+  const PRICE = 35000, INSTALL = 10000;
+  // Códigos de promoción protegidos: no se guardan en texto. Para activar/desactivar,
+  // cambia true/false según el número (#) de tu lista privada.
+  const CODES = {
+    "1fe0e86008ee40": [25000, "U2Nvb3RlcnMgQ28=", true],   // #1
+    "895a160b9c1bd": [25000, "U2Nvb3RlcnMgQ28=", true],   // #2
+    "1957a78b1f33a6": [30000, "RGVzdGVj", true],   // #3
+    "184a8be778ec03": [20000, "Q2l0eSBCaWtl", true],   // #4
+    "1433ca9a0a91c1": [18000, "RW1wcmVzYQ==", true],   // #5
+    "6f78459d51995": [30000, "UGluYXI=", true],   // #6
+    "dd6a4987a2768": [30000, "Q2FtcGHDsWEgMjAyNw==", true]   // #7
+  };
+  const h53 = (str, seed = 2486) => { let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16); };
+  const lookup = c => { const r = CODES[h53(c)]; if (!r) return null;
+    let n = r[1]; try { n = decodeURIComponent(escape(atob(r[1]))); } catch(e) {} return [r[0], n, r[2]]; };
+  const $ = id => document.getElementById(id);
+  const val = name => (document.querySelector('input[name="'+name+'"]:checked')||{}).value || "";
+  const money = n => "$" + n.toLocaleString("es-CO").replace(/,/g,".");
+
+  // years
+  const yNow = 2026;
+  for (let y = yNow + 1; y >= 2012; y--) { const o = document.createElement("option"); o.value = o.textContent = y; $("anio").appendChild(o); }
+
+  // Clasificación según Anexo 80 (Res. 20263040030675) y exención del art. 15 de la Ley 2486
+  function clase(){
+    const t = val("tipo"), v = parseFloat($("vmax").value), p = parseFloat($("pot").value), w = parseFloat($("peso").value);
+    const acel = val("acel"), auto = val("auto") === "Si", una = val("plazas") !== "2";
+    if (!t || isNaN(v) || isNaN(p) || isNaN(w)) return {c:"", msg:"Llena tipo, velocidad, potencia y peso, y la categoría y clase se calculan solas."};
+    if ((t === "Bicicleta" || t === "Triciclo") && !acel) return {c:"", msg:"Cuéntanos si tiene acelerador."};
+    const R = m => ({c:"REVISAR", warn:true, msg:m});
+    if (v < 6) return R("Menos de 6 km/h no está en las clases de la norma. Revisa el dato o escríbenos.");
+    if (v > 45 || p > 4000) return R("Más de 45 km/h o más de 4000 W: no es micromovilidad. Necesita matrícula y placa del RUNT, no esta lámina.");
+    if (!(w <= 60 || v <= 40)) return R("Pesa más de 60 kg y supera 40 km/h: no está exceptuado por el artículo 15 de la Ley 2486. Necesita matrícula, no esta lámina.");
+    const VEL = "VELMPU", L1 = "L1e", L2 = "L2e";
+    if (t === "Triciclo") {
+      if (acel === "No" && p <= 500 && v <= 25 && w < 270) return {c:"TRICIMÓVIL", cat:"TRICIMÓVIL", plate:"TRICIMÓVIL", msg:"Tricimóvil con pedaleo asistido: hasta 500 W, la ayuda se corta a los 25 km/h."};
+      if (w < 270) return val("uso") === "Carga"
+        ? {c:"L2e-U", cat:L2, plate:"L2e-U", msg:"Ciclomotor de tres ruedas para mercancías (L2e-U): hasta 45 km/h y 4000 W."}
+        : {c:"L2e-P", cat:L2, plate:"L2e-P", msg:"Ciclomotor de tres ruedas para pasajeros (L2e-P): hasta 45 km/h, 4000 W y 2 plazas."};
+      return R("Un triciclo de 270 kg o más no está en las clases de la norma. Escríbenos.");
+    }
+    const potMax = auto ? 2500 : 1000;
+    if (t === "Monociclo") {
+      if (v <= 25 && p <= potMax) return {c:"MONOCICLO", cat:VEL, plate:"MONOCICLO", msg:"VELMPU, monociclo de propulsión eléctrica: de 6 a 25 km/h."};
+      return R("Un monociclo eléctrico debe estar entre 6 y 25 km/h y hasta " + potMax + " W. Revisa el dato o escríbenos.");
+    }
+    if (t === "Bicicleta" && acel === "No" && v <= 25 && p <= 1000) {
+      if (una) return {c:"BICICLETA ELÉCTRICA", cat:VEL, plate:"BICI ELÉC.", msg:"VELMPU, bicicleta eléctrica: una plaza, sin acelerador, la ayuda se corta a los 25 km/h."};
+      return {c:"L1e-A", cat:L1, plate:"L1e-A", msg:"Ciclo de motor (L1e-A): pedaleo asistido hasta 25 km/h y 1000 W. Al tener 2 plazas no es VELMPU."};
+    }
+    if (una && v <= 40 && p <= potMax) {
+      if (v <= 25) return {c:"VMP (A)", cat:VEL, plate:"VMP (A)", msg:"VELMPU, vehículo de movilidad personal (A): de 6 a 25 km/h."};
+      return {c:"VMP (B)", cat:VEL, plate:"VMP (B)", msg:"VELMPU, vehículo de movilidad personal (B): más de 25 y hasta 40 km/h."};
+    }
+    return {c:"L1e-B", cat:L1, plate:"L1e-B", msg:"Ciclomotor de dos ruedas (L1e-B): hasta 45 km/h y 4000 W. No es VELMPU por " + (!una ? "tener 2 plazas" : (v > 40 ? "superar 40 km/h" : "superar " + potMax + " W")) + "."};
+  }
+
+  const clean = s => (s||"").replace(/[,;"\n\r]/g," ").replace(/\s+/g," ").trim();
+  const serial = () => clean($("serie").value).toUpperCase();
+
+  function boxes(cl){
+    const vals = [
+      [clean($("marca").value)||"-","MARCA"],
+      [clean($("modelo").value)||"-","MODELO"],
+      [$("peso").value ? clean($("peso").value).replace(".",",")+" kg" : "-","PESO"],
+      [cl.cat || (cl.c==="REVISAR"?"?":"-"),"CATEGORÍA"],
+      [cl.plate || (cl.c==="REVISAR"?"?":"-"),"CLASE"]
+    ];
+    const g = $("pv-boxes"); g.innerHTML = "";
+    const x0 = 8, bw = 16.4, gap = 1.6, ns = "http://www.w3.org/2000/svg";
+    vals.forEach(([v,l],i)=>{
+      const x = x0 + i*(bw+gap);
+      const r = document.createElementNS(ns,"rect");
+      r.setAttribute("x",x); r.setAttribute("y",22.6); r.setAttribute("width",bw); r.setAttribute("height",4.4);
+      r.setAttribute("fill","none"); r.setAttribute("stroke","#cfd2d6"); r.setAttribute("stroke-width",".25"); g.appendChild(r);
+      const t = document.createElementNS(ns,"text");
+      t.setAttribute("x",x+bw/2); t.setAttribute("y",26.0); t.setAttribute("font-size","3"); t.setAttribute("text-anchor","middle");
+      t.textContent = v; g.appendChild(t);
+      if (v.length > 8) { t.setAttribute("textLength", bw-1); t.setAttribute("lengthAdjust","spacingAndGlyphs"); }
+      const s = document.createElementNS(ns,"text");
+      s.setAttribute("x",x+bw/2); s.setAttribute("y",28.9); s.setAttribute("font-size","1.4"); s.setAttribute("text-anchor","middle"); s.setAttribute("font-weight","400");
+      s.textContent = l; g.appendChild(s);
+    });
+  }
+
+  function update(){
+    const t = val("tipo");
+    $("accWrap").classList.toggle("hidden", !(t === "Bicicleta" || t === "Triciclo"));
+    $("usoWrap").classList.toggle("hidden", t !== "Triciclo");
+    $("autoWrap").classList.toggle("hidden", !(t === "Monociclo" || t === "Patineta"));
+    $("dirWrap").classList.toggle("hidden", val("entrega") !== "Envío");
+
+    const cl = clase();
+    const box = $("claseBox");
+    box.classList.toggle("ok", !!cl.c && !cl.warn);
+    box.classList.toggle("warn", !!cl.warn);
+    $("claseTxt").textContent = cl.cat ? (cl.cat === cl.c ? cl.c : cl.cat + " · " + cl.c) : (cl.c || "—");
+    $("claseNote").textContent = cl.msg;
+    $("claseNote").classList.toggle("warn", !!cl.warn);
+
+    // plate preview
+    $("pv-vmax").textContent = $("vmax").value || "--";
+    const s = serial(); const ps = $("pv-serie");
+    ps.textContent = s || "-";
+    if (s.length > 20) { ps.setAttribute("textLength", 55.6); ps.setAttribute("lengthAdjust","spacingAndGlyphs"); }
+    else ps.removeAttribute("textLength");
+    // live serial match check
+    const s2 = clean($("serie2").value).toUpperCase(), sn = $("serieNote"), in2 = $("serie2");
+    in2.classList.remove("bad","good"); sn.className = "note"; sn.textContent = "";
+    if (s2) {
+      if (s2 === s) { in2.classList.add("good"); sn.classList.add("ok"); sn.textContent = "✓ Los números de serie coinciden."; }
+      else if (s.startsWith(s2)) { sn.textContent = "Sigue escribiendo…"; }
+      else { in2.classList.add("bad"); sn.classList.add("warn"); sn.textContent = "✗ No coincide con el primero. Revisa letra por letra."; }
+    }
+    $("pv-anio").textContent = $("anio").value || "-";
+    $("pv-pot").textContent = $("pot").value ? $("pot").value + "W" : "-";
+    boxes(cl);
+
+    // price
+    const code = clean($("codigo").value).toUpperCase();
+    const found = lookup(code.replace(/\s+/g,""));
+    const promo = found && found[2] ? found : null;
+    const ref = !!promo;
+    const cn = $("codNote"), ci = $("codigo");
+    cn.className = "note"; ci.classList.remove("bad","good"); cn.textContent = "";
+    if (code) {
+      if (ref) { cn.classList.add("ok"); ci.classList.add("good"); cn.textContent = "✓ Código " + promo[1] + " aplicado: ahorras " + money(PRICE - promo[0]) + " (" + Math.round((PRICE - promo[0]) * 100 / PRICE) + "%)."; }
+      else if (found) { cn.classList.add("warn"); ci.classList.add("bad"); cn.textContent = "✗ El código " + code + " ya no está activo. Se cobra el precio normal de " + money(PRICE) + "."; }
+      else { cn.classList.add("warn"); ci.classList.add("bad"); cn.textContent = "✗ El código " + code + " no existe. Revisa cómo lo escribiste o déjalo vacío. Se cobra el precio normal de " + money(PRICE) + "."; }
+    }
+    const base = ref ? promo[0] : PRICE;
+    const inst = $("inst").checked ? INSTALL : 0;
+    let html = "<div><span>Placa</span><span>" + money(PRICE) + "</span></div>";
+    if (ref) html += "<div style=\"color:var(--grn)\"><span>Descuento código " + promo[1] + "</span><span>−" + money(PRICE - base) + "</span></div>";
+    if (inst) html += "<div><span>Instalación</span><span>" + money(inst) + "</span></div>";
+    if (val("entrega") === "Envío") html += "<div><span>Envío</span><span>Se confirma</span></div>";
+    $("lines").innerHTML = html;
+    $("total").textContent = money(base + inst) + (val("entrega") === "Envío" ? " + envío" : "");
+    $("total").style.fontSize = val("entrega") === "Envío" ? "30px" : "";
+    return {cl, ref, base, inst, code: ref ? code : ""};
+  }
+
+  function validate(){
+    const e = []; const mark = (id, bad) => $(id).classList.toggle("bad", !!bad);
+    if (!val("tipo")) e.push("Elige el tipo de vehículo.");
+    if (val("tipo") === "Bicicleta" && !val("acel")) e.push("Dinos si la bicicleta tiene acelerador.");
+    const v = $("vmax").value, p = $("pot").value, w = $("peso").value;
+    mark("vmax",!v); mark("pot",!p); mark("peso",!w);
+    if (!v) e.push("Falta la velocidad máxima."); if (!p) e.push("Falta la potencia."); if (!w) e.push("Falta el peso.");
+    mark("marca",!clean($("marca").value)); if (!clean($("marca").value)) e.push("Falta la marca.");
+    mark("modelo",!clean($("modelo").value)); if (!clean($("modelo").value)) e.push("Falta el modelo.");
+    mark("anio",!$("anio").value); if (!$("anio").value) e.push("Elige el año de fabricación.");
+    const s1 = serial(), s2 = clean($("serie2").value).toUpperCase();
+    mark("serie", s1.length < 4); mark("serie2", s1 !== s2);
+    if (s1.length < 4) e.push("Escribe el número de serie completo.");
+    else if (s1 !== s2) e.push("Los dos números de serie no coinciden.");
+    if (!$("foto").checked) e.push("Confirma que revisaste tus datos.");
+    mark("nombre",!clean($("nombre").value)); if (!clean($("nombre").value)) e.push("Escribe tu nombre.");
+    const cel = $("cel").value.replace(/\D/g,"");
+    mark("cel", !/^3\d{9}$/.test(cel)); if (!/^3\d{9}$/.test(cel)) e.push("El celular debe tener 10 dígitos y empezar por 3.");
+    mark("ciudad",!clean($("ciudad").value)); if (!clean($("ciudad").value)) e.push("Escribe tu ciudad.");
+    if (val("entrega") === "Envío") { mark("dir",!clean($("dir").value)); if (!clean($("dir").value)) e.push("Escribe la dirección de envío."); }
+    return e;
+  }
+
+  function buildMsg(st){
+    const cl = st.cl;
+    const vmax = clean($("vmax").value), serie = serial(), anio = $("anio").value, pot = clean($("pot").value);
+    const marca = clean($("marca").value), modelo = clean($("modelo").value), peso = clean($("peso").value);
+    const claseCsv = cl.plate || "REVISAR";
+    const csv = [vmax, serie, anio, pot+"W", marca, modelo, peso+" kg", cl.cat || "REVISAR", claseCsv].join(",");
+    const lines = [
+      "*PEDIDO PLACA LEY 2486*",
+      "",
+      "*Vehículo:* " + val("tipo") + ((val("tipo")==="Bicicleta"||val("tipo")==="Triciclo") ? " (acelerador: " + val("acel") + ")" : "") + (val("tipo")==="Triciclo" ? " · uso: " + val("uso") : "") + (val("plazas")==="2" ? " · 2 plazas" : "") + (val("auto")==="Si" && !$("autoWrap").classList.contains("hidden") ? " · autoequilibrio" : ""),
+      "*Marca / modelo:* " + marca + " " + modelo,
+      "*Serie:* " + serie,
+      "*Año:* " + anio,
+      "*Vel. máx:* " + vmax + " km/h · *Potencia:* " + pot + " W · *Peso:* " + peso + " kg",
+      "*Categoría / clase:* " + (cl.cat || "REVISAR") + " / " + (cl.c || "REVISAR"),
+      "",
+      "*Cliente:* " + clean($("nombre").value),
+      "*Celular:* " + $("cel").value.replace(/\D/g,""),
+      "*Ciudad:* " + clean($("ciudad").value),
+      "*Entrega:* " + val("entrega") + (val("entrega")==="Envío" ? " — " + clean($("dir").value) : ""),
+      "*Instalación:* " + ($("inst").checked ? "Sí" : "No"),
+      st.code ? "*Código:* " + st.code + " (descuento " + money(PRICE - st.base) + ")" : "",
+      "*Total:* " + money(st.base + st.inst) + (val("entrega")==="Envío" ? " + envío" : ""),
+      "",
+      "CSV: " + csv,
+      "",
+      "Confirmo que los datos están correctos."
+    ].filter((l,i,a)=> !(l==="" && a[i-1]==="") && l!==null);
+    return lines.filter(l => l !== "" || true).join("\n").replace(/\n{3,}/g,"\n\n");
+  }
+
+  document.addEventListener("input", update);
+  document.addEventListener("change", update);
+
+  let lastSt = null;
+  $("f").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const st = update();
+    const errs = validate();
+    const box = $("errors");
+    if (errs.length) {
+      box.innerHTML = "<b>Revisa esto:</b><ul>" + errs.map(e=>"<li>"+e+"</li>").join("") + "</ul>";
+      box.style.display = "block"; box.scrollIntoView({behavior:"smooth", block:"center"}); return;
+    }
+    box.style.display = "none";
+    lastSt = st;
+    $("lines2").innerHTML = $("lines").innerHTML + '<div style="font-weight:800;color:var(--txt)"><span>Total</span><span>' + $("total").textContent + "</span></div>";
+    if (USE_SHEET) { $("sendBtn").style.display = "block"; $("waBtn").style.display = "none"; }
+    else { $("sendBtn").style.display = "none"; $("waBtn").style.display = "block";
+           $("waBtn").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(buildMsg(st)); }
+    $("sendErr").style.display = "none";
+    $("stepConfirm").style.display = "block"; $("stepOk").style.display = "none";
+    $("f").style.display = "none";
+    $("done").style.display = "block";
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+
+  function payload(st){
+    const cl = st.cl;
+    return {
+      nombre: clean($("nombre").value), celular: $("cel").value.replace(/\D/g,""), ciudad: clean($("ciudad").value),
+      entrega: val("entrega"), direccion: val("entrega")==="Envío" ? clean($("dir").value) : "",
+      instalacion: $("inst").checked, codigo: st.code || "",
+      tipo: val("tipo"), plazas: val("plazas")==="2" ? "2 o más" : "1",
+      acelerador: $("accWrap").classList.contains("hidden") ? "" : val("acel"),
+      uso: $("usoWrap").classList.contains("hidden") ? "" : val("uso"),
+      autoequilibrio: $("autoWrap").classList.contains("hidden") ? "" : val("auto"),
+      vmax: clean($("vmax").value), pot: clean($("pot").value), peso: clean($("peso").value),
+      marca: clean($("marca").value), modelo: clean($("modelo").value), anio: $("anio").value, serie: serial(),
+      categoria: cl.cat || "REVISAR", clase: cl.plate || "REVISAR"
+    };
+  }
+
+  $("sendBtn").addEventListener("click", async () => {
+    const btn = $("sendBtn"), err = $("sendErr");
+    btn.disabled = true; btn.textContent = "Enviando…"; err.style.display = "none";
+    try {
+      const r = await fetch(SCRIPT_URL, {method:"POST", body: JSON.stringify(payload(lastSt))});
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "error");
+      $("okId").textContent = "#" + j.id;
+      $("okTotal").textContent = money(j.total) + (val("entrega")==="Envío" ? " + envío" : "");
+      const m = "Hola, acabo de hacer el pedido #" + j.id + " de placa Ley 2486 a nombre de " + clean($("nombre").value) +
+                ". Total: " + money(j.total) + (val("entrega")==="Envío" ? " + envío" : "") + ". ¿Cómo hago el pago?";
+      $("waOk").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(m);
+      $("stepConfirm").style.display = "none"; $("stepOk").style.display = "block";
+      window.scrollTo({top:0, behavior:"smooth"});
+    } catch(e) {
+      err.innerHTML = "<b>No pudimos enviar tu pedido.</b> Revisa tu conexión e inténtalo de nuevo. Si sigue fallando, escríbenos al 311 500 7275.";
+      err.style.display = "block";
+    } finally { btn.disabled = false; btn.textContent = "Confirmar y enviar pedido"; }
+  });
+
+  $("editBtn").addEventListener("click", () => { $("done").style.display = "none"; $("f").style.display = "block"; });
+
+  update();
+})();
+</script>
+</body>
+</html>
